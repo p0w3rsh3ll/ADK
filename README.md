@@ -1,1 +1,1 @@
-PowerShell Desired State Configuration
+Windows Assessment and Deployment Kit

@@ -1,5 +1,5 @@
-Function Get-ADKFiles that downloads the ADK (Windows Assessment and Deployment Kit)
-====================================================================================
+Download the Windows Assessment and Deployment Kit
+==================================================
 
 Usage
 -----
