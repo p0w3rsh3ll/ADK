@@ -30,6 +30,6 @@ Import-Csv  ~/documents\SHA256SUMS.csv -Delimiter ";" | Foreach-Object {
 
 ```powershell
  if ($PSVersionTable.PSVersion -gt [version]'5.1') {
-     Test-FileCatalog -Path C:\ADK -CatalogFilePath C:\ADK\catalog.cat -Detailed
+     Test-FileCatalog -Path C:\ADK -CatalogFilePath C:\ADK\catalog.cat -Detailed -FilesToSkip catatlog.cat,SHA256SUMS.csv,UserExperienceManifest.xml,README.md,Get-ADKFiles.ps1
  }
 ```
