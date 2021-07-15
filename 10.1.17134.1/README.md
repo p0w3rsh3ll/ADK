@@ -18,7 +18,7 @@ Integrity
 You can check the integrity of the downloaded files
 
 ```powershell
-Import-Csv  ~/documents\SHA256SUMS.csv -Delimiter ";" | Foreach-Object {
+Import-Csv  ~/documents\SHA256SUMS.csv -Delimiter ';' | Foreach-Object {
 
     if ( (Get-FileHash -Path (Join-Path -Path C:\ADK -ChildPath $($_.File))).Hash -eq $_.Hash) {
         Write-Verbose -Message "OK: $($_.File)" -Verbose
@@ -31,7 +31,7 @@ Import-Csv  ~/documents\SHA256SUMS.csv -Delimiter ";" | Foreach-Object {
 ```powershell
  if ($PSVersionTable.PSVersion -gt [version]'5.1') {
      $files2Skip = @(
-         'catatlog.cat',
+         'catalog.cat',
          'SHA256SUMS.csv',
          'UserExperienceManifest.xml',
          'README.md',

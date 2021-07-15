@@ -18,7 +18,7 @@ Integrity
 You can check the integrity of the downloaded files
 
 ```
-Import-Csv  ~/documents\SHA256SUMS.csv -Delimiter ";" | Foreach-Object {
+Import-Csv  ~/documents\SHA256SUMS.csv -Delimiter ';' | Foreach-Object {
 
     if ( (Get-FileHash -Path (Join-Path -Path C:\ADK\v10 -ChildPath $($_.File))).Hash -eq $_.Hash) {
         Write-Verbose -Message "OK: $($_.File)" -Verbose

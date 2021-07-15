@@ -27,7 +27,7 @@ You can check the integrity of the downloaded files
 
 ```powershell
 # ADK
-Import-Csv  ~/documents\ADK-SHA256SUMS.csv -Delimiter ";" | 
+Import-Csv  ~/documents\ADK-SHA256SUMS.csv -Delimiter ';' | 
 Foreach-Object {
 
     if ( (Get-FileHash -Path (Join-Path -Path C:\Download\ADK -ChildPath $($_.File))).Hash -eq $_.Hash) {
@@ -37,7 +37,7 @@ Foreach-Object {
     }
 }
 # ADKWinPEAddons
-Import-Csv  ~/documents\PE-SHA256SUMS.csv -Delimiter ";" | 
+Import-Csv  ~/documents\PE-SHA256SUMS.csv -Delimiter ';' | 
 Foreach-Object {
     if ( (Get-FileHash -Path (Join-Path -Path C:\Download\ADKWinPEAddons -ChildPath $($_.File))).Hash -eq $_.Hash) {
         Write-Verbose -Message "OK: $($_.File)" -Verbose
@@ -51,8 +51,8 @@ Foreach-Object {
  if ($PSVersionTable.PSVersion -gt [version]'5.1') 
  {
      $files2Skip = @(
-         'ADK-catatlog.cat',
-         'PE-catatlog.cat',         
+         'ADK-catalog.cat',
+         'PE-catalog.cat',         
          'ADK-SHA256SUMS.csv',
          'PE-SHA256SUMS.csv',         
          'UserExperienceManifest.xml',

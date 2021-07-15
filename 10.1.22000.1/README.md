@@ -1,6 +1,8 @@
 Download the Windows Assessment and Deployment Kit
 ==================================================
 
+Links
+-----
 [Info](https://docs.microsoft.com/en-us/windows-hardware/get-started/adk-install)
 > 
 
@@ -25,6 +27,7 @@ Integrity
 
 You can check the integrity of the downloaded files
 
+Using SHA2 hashes loaded from a CSV file
 ```powershell
 # ADK
 Import-Csv  ~/Documents\ADK-SHA256SUMS.csv -Delimiter ';' | 
@@ -46,7 +49,7 @@ Foreach-Object {
     }
 }
 ```
-
+Using SHA2 hashes loaded from a catalog file
 ```powershell
  if ($PSVersionTable.PSVersion -gt [version]'5.1') 
  {
