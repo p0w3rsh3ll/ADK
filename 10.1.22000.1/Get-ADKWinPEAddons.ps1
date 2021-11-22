@@ -22,14 +22,14 @@ Begin {
 
 Process {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $adkGenericURL = (Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?linkid=2095641' -MaximumRedirection 0 -ErrorAction SilentlyContinue)
+    $adkGenericURL = (Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?linkid=2148910' -MaximumRedirection 0 -ErrorAction SilentlyContinue)
     
     # 302 = redirect as moved temporarily
     # 301 = Moved Permanently
     if ($adkGenericURL.StatusCode -eq 302) {
 
-        # Currently set to https://download.microsoft.com/download/3/c/2/3c2b23b2-96a0-452c-b9fd-6df72266e335/adkwinpeaddons
-        # Resolving download root for: https://go.microsoft.com/fwlink/?linkid=2095641
+        # Currently set to https://download.microsoft.com/download/5/5/e/55e3e34a-5708-46cd-a90d-92044c29336b/adkwinpeaddons/
+        # Resolving download root for: https://go.microsoft.com/fwlink/?linkid=2148910
         $MainURL = $adkGenericURL.Headers.Location
 
         Write-Verbose "Root URI set to $($MainURL)"
