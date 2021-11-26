@@ -3,6 +3,7 @@ Windows Assessment and Deployment Kit (ADK)
 
 Download ADK for:
 * [Windows 11](./10.1.22000.1)
+* [Windows Server 2022](./10.1.20348.1)
 * [Windows 21H1](./10.1.19041.1)
 * [Windows 20H2](./10.1.19041.1)
 * [Windows 20H1 (2004)](./10.1.19041.1)
@@ -14,6 +15,5 @@ Download ADK for:
 * [Windows 1703](./10.1.15063.0)
 * [Windows 1607](./10.1.14393.0)
 
-* [Windows Server 2022](./10.1.20348.1)
 
 [Official Microsoft documentation](https://docs.microsoft.com/en-us/windows-hardware/get-started/adk-install)
