@@ -13,3 +13,5 @@ Download ADK for:
 * [Windows 1709](./10.1.16299.15)
 * [Windows 1703](./10.1.15063.0)
 * [Windows 1607](./10.1.14393.0)
+
+[Official Microsoft documentation](https://docs.microsoft.com/en-us/windows-hardware/get-started/adk-install)
