@@ -2,6 +2,7 @@ Windows Assessment and Deployment Kit (ADK)
 ===========================================
 
 Download ADK for:
+* [Windows 11 22H2](./10.1.22621.1)
 * [Windows 11](./10.1.22000.1)
 * [Windows Server 2022](./10.1.20348.1)
 * [Windows 21H1](./10.1.19041.1)
