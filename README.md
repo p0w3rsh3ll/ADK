@@ -2,6 +2,7 @@ Windows Assessment and Deployment Kit (ADK)
 ===========================================
 
 Download ADK for:
+* [Windows 11 24H2 (Dec 2024)](./10.1.26100.2454)
 * [Windows 11 24H2 (May 2024)](./10.1.26100.1)
 
 > The Windows ADK 10.1.26100.1 (May 2024) and the Windows PE add-on for this ADK support the following OS releases:
