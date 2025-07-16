@@ -1,4 +1,4 @@
-#Requires -Version 4
+﻿#Requires -Version 4
 #Requires -RunAsAdministrator
 
 Function Get-ADKFiles {
@@ -8,9 +8,9 @@ Param(
     [system.string]$TargetFolder
 )
 Begin {
-    
+
     $HT = @{ ErrorAction = 'Stop'}
-    
+
     # Validate target folder
     try {
         $null = Get-Item $TargetFolder @HT
@@ -23,12 +23,12 @@ Begin {
 Process {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $adkGenericURL = (Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?linkid=2175270' -MaximumRedirection 0 -ErrorAction SilentlyContinue)
-    
+
     # 302 = redirect as moved temporarily
     # 301 = Moved Permanently
     if ($adkGenericURL.StatusCode -eq 302) {
 
-        # Currently set to https://download.microsoft.com/download/6/7/4/674ec7db-7c89-4f2b-8363-689055c2b430/adk
+        # Currently set to https://download.microsoft.com/download/8cf6cfec-5fa8-44cb-b7cc-a024482729d6/adk
         #  Resolving download root for: https://go.microsoft.com/fwlink/?linkid=2175270
         $MainURL = $adkGenericURL.Headers.Location
 
@@ -37,7 +37,7 @@ Process {
         if(-not ($MainURL.EndsWith('/'))) {
             $MainURL = "$($MainURL)/"
         }
-    
+
         $InstallerURLs = DATA {
             ConvertFrom-StringData @'
 0=01c28e2afff11c906894fd0d3e54ea0c.cab
@@ -378,7 +378,7 @@ Process {
             Write-Warning -Message "Failed to download adksetup.exe because $($_.Exception.Message)"
             break
         }
-    
+
         # Create a job that will downlad our first file
         $ffsource = "$($MainURL)Installers/$($InstallerURLs['0'])"
         $ffdest   = (Join-Path -Path $TargetFolder -ChildPath ("Installers/$($InstallerURLs['0'])"))
@@ -396,7 +396,7 @@ Process {
             Write-Warning -Message "Failed to create first BITS job because $($_.Exception.Message)"
             break
         }
-            
+
         # Downlod installers
         For ($i = 1 ; $i -lt $InstallerURLs.Count ; $i++) {
             $URL = $Destination = $null
@@ -406,15 +406,15 @@ Process {
             # Add-BitsFile http://technet.microsoft.com/en-us/library/dd819411.aspx
             $newjob = Add-BitsFile -BitsJob $job -Source  $URL -Destination $Destination
             Write-Progress -Activity "Adding file $($newjob.FilesTotal)" -Status "Percent completed: " -PercentComplete (($newjob.FilesTotal)*100/($InstallerURLs.Count))
-        } 
+        }
 
         # Begin the download and show us the job
         $null = Resume-BitsTransfer  -BitsJob $job -Asynchronous
-    
+
         # http://msdn.microsoft.com/en-us/library/windows/desktop/ee663885%28v=vs.85%29.aspx
         while ($job.JobState -in @('Connecting','Transferring','Queued')) {
             Write-Progress -activity 'Downloading ADK files' -Status 'Percent completed: ' -PercentComplete ($job.BytesTransferred*100/$job.BytesTotal)
-        } 
+        }
         Switch($job.JobState) {
              'Transferred' {
                 Complete-BitsTransfer -BitsJob $job
@@ -424,10 +424,10 @@ Process {
              'Error' {
                 # List the errors.
                 $job | Format-List
-            } 
+            }
             default {
                 # Perform corrective action.
-            } 
+            }
         }
     } else {
         Write-Warning -Message "Guessing the ADK location returned the status code $($adkGenericURL.StatusCode)"
