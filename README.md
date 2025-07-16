@@ -11,7 +11,7 @@ Download ADK for:
 > Windows Server 2025, and Windows Server 2022
 
 * [Windows 11 23H2](./10.1.25398.1)
-* [Windows 11 22H2](./10.1.22621.1)
+* [Windows 11 22H2](./10.1.22621.5337)
 * [Windows 11](./10.1.22000.1)
 * [Windows Server 2022](./10.1.20348.1)
 * [Windows 21H1](./10.1.19041.1)
