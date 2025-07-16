@@ -1,14 +1,11 @@
-﻿#Requires -Version 4
+﻿#Requires -Version 5.1
 #Requires -RunAsAdministrator
 
 Function Get-ADKWinPEAddonsFile {
 [CmdletBinding()]
 Param(
     [parameter(Mandatory)]
-    [system.string]$TargetFolder,
-
-    [switch]$OnlySetupFile
-
+    [system.string]$TargetFolder
 )
 Begin {
 
@@ -31,7 +28,7 @@ Process {
     # 301 = Moved Permanently
     if ($adkGenericURL.StatusCode -eq 302) {
 
-        # Currently set to https://download.microsoft.com/download/8/3/8/838d6e29-eaac-498b-82ad-5fbac20136f8/adkwinpeaddons/
+        # Currently set to https://download.microsoft.com/download/7ac54d34-b7b7-44f8-9c9b-e2f8db79995a/adkwinpeaddons
         # Resolving download root for: https://go.microsoft.com/fwlink/?linkid=2147646
         $MainURL = $adkGenericURL.Headers.Location
 
@@ -41,6 +38,41 @@ Process {
             $MainURL = "$($MainURL)/"
         }
 
+        $InstallerURLs = DATA {
+            ConvertFrom-StringData @'
+0=0b63b7c537782729483bff2d64a620fa.cab
+1=24ab0f36f991590c112d8f31215bfe53.cab
+2=3b8aa90b3015bd30b59330184cbbb275.cab
+3=3ffff92a2c7e8b2f1a6e85afeaa027ca.cab
+4=856a378483a6c7e8068c4f52cb49227c.cab
+5=8a2e0a0e136870ff08761f9842218e80.cab
+6=9722214af0ab8aa9dffb6cfdafd937b7.cab
+7=a32918368eba6a062aaaaf73e3618131.cab
+8=a6296c5a6eec9ca02b431ed0461b952d.cab
+9=aa25d18a5fcce134b0b89fb003ec99ff.cab
+10=b349f96e35f982019f2133020a0e1d4e.cab
+11=bfdbb113d9d5201e5897ed28d0a47f42.cab
+12=f53c2cdf2f5aeeaef4ca19d4b3344930.cab
+13=Kits Configuration Installer-x86_en-us.msi
+14=Windows PE Boot Files (DesktopEditions)-x86_en-us.msi
+15=Windows PE Boot Files (OnecoreUAP)-x86_en-us.msi
+16=Windows PE Optional Packages (DesktopEditions)-x86_en-us.msi
+17=Windows PE Scripts-x86_en-us.msi
+18=Windows PE wims (DesktopEditions)-x86_en-us.msi
+'@
+        }
+
+        'Installers' | ForEach-Object -Process {
+            # Create target folders if required as BIT doesn't accept missing folders
+            If (-not(Test-Path (Join-Path -Path $TargetFolder -ChildPath $_))) {
+                try {
+                    $null = New-Item -Path (Join-Path -Path $TargetFolder -ChildPath $_) -ItemType Directory -Force @HT
+                } catch {
+                    Write-Warning -Message "Failed to create folder $($TargetFolder)/$_"
+                    break
+                }
+            }
+        }
         # Get adkwinpesetup.exe
         try {
             Write-Verbose -Message "Attempt to download adkwinpesetup.exe from $($MainURL)adkwinpesetup.exe"
@@ -50,25 +82,10 @@ Process {
             Write-Warning -Message "Failed to download adkwinpesetup.exe because $($_.Exception.Message)"
             break
         }
-    } else {
-        Write-Warning -Message "Guessing the ADK location returned the status code $($adkGenericURL.StatusCode)"
-    }
-
- if (-not($OnlySetupFile)) {
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $IsoGenericURL = (Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?linkid=2163233' -MaximumRedirection 0 -ErrorAction SilentlyContinue)
-
-    # 302 = redirect as moved temporarily
-    # 301 = Moved Permanently
-    if ($IsoGenericURL.StatusCode -eq 302) {
-
-        # Currently set to https://software-download.microsoft.com/download/sg/20348.1.210507-1500.fe_release_amd64fre_ADKWINPEADDONS.iso
-        $MainIsoURL = $IsoGenericURL.Headers.Location
-        Write-Verbose "Root URI set to $($MainIsoURL)"
 
         # Create a job that will downlad our first file
-        $ffsource = $MainIsoURL
-        $ffdest   = (Join-Path -Path $TargetFolder -ChildPath "$(([URI]$MainIsoURL).Segments[-1])")
+        $ffsource = "$($MainURL)Installers/$($InstallerURLs['0'])"
+        $ffdest   = (Join-Path -Path $TargetFolder -ChildPath ("Installers/$($InstallerURLs['0'])"))
         $fjobHT = @{
             Suspended = $true ;
             Asynchronous = $true
@@ -84,17 +101,28 @@ Process {
             break
         }
 
+        # Downlod installers
+        For ($i = 1 ; $i -lt $InstallerURLs.Count ; $i++) {
+            $URL = $Destination = $null
+            $URL = "$($MainURL)Installers/$($InstallerURLs[$i.ToString()])"
+            $Destination = Join-Path -Path (Join-Path -Path $TargetFolder -ChildPath Installers) -ChildPath (([URI]$URL).Segments[-1] -replace '%20'," ")
+            Write-Verbose -Message "Attempt to add to download list $($URL) saved to $($Destination)"
+            # Add-BitsFile http://technet.microsoft.com/en-us/library/dd819411.aspx
+            $newjob = Add-BitsFile -BitsJob $job -Source  $URL -Destination $Destination
+            Write-Progress -Activity "Adding file $($newjob.FilesTotal)" -Status "Percent completed: " -PercentComplete (($newjob.FilesTotal)*100/($InstallerURLs.Count))
+        }
+
         # Begin the download and show us the job
         $null = Resume-BitsTransfer  -BitsJob $job -Asynchronous
 
         # http://msdn.microsoft.com/en-us/library/windows/desktop/ee663885%28v=vs.85%29.aspx
         while ($job.JobState -in @('Connecting','Transferring','Queued')) {
-            Write-Progress -activity 'Downloading ADK ISO file' -Status 'Percent completed: ' -PercentComplete ($job.BytesTransferred*100/$job.BytesTotal)
+            Write-Progress -activity 'Downloading ADK files' -Status 'Percent completed: ' -PercentComplete ($job.BytesTransferred*100/$job.BytesTotal)
         }
         Switch($job.JobState) {
              'Transferred' {
                 Complete-BitsTransfer -BitsJob $job
-                Write-Verbose -Message "Successfully downloaded ADK ISO file to $($TargetFolder)"
+                Write-Verbose -Message "Successfully downloaded ADK to $($TargetFolder)"
                 break
             }
              'Error' {
@@ -106,9 +134,8 @@ Process {
             }
         }
     } else {
-        Write-Warning -Message "Guessing the ADK iso location returned the status code $($IsoGenericURL.StatusCode)"
+        Write-Warning -Message "Guessing the ADK location returned the status code $($adkGenericURL.StatusCode)"
     }
- }
 }
 End {}
 }
