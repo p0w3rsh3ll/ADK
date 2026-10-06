@@ -2,6 +2,7 @@ Windows Assessment and Deployment Kit (ADK)
 ===========================================
 
 Download ADK for:
+* [Windows 11 26H2 (September 2026)](./10.1.26100.9457)
 * [Windows 11 24H2 (Dec 2024)](./10.1.26100.2454)
 
 > Fixed ADK and WinPE add-on installers to remove a vulnerability.
